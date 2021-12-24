@@ -1,0 +1,84 @@
+---
+title: "Marray material"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown Presentation Prep.
+
+Loading the data onto R
+```{r}
+library(rentrez);library(ape);library(gplots);library(RColorBrewer);library(ggplot2);library(ggfortify)
+JARA<-read.table("JARAAnalysisTab.txt",sep = "\t",header = TRUE)
+```
+
+kmeans with 2 diff cluster based on signal strength
+```{r}
+JARA.sig<-data.frame(JARA[,9],JARA[,10])
+cl<-kmeans(JARA.sig,2)
+plot(JARA.sig,col=cl$cluster)
+
+```
+
+hclust with euclidian method based on signal strength
+```{r}
+x<-c(JARA[,9],JARA[,10])
+sl.out<-hclust(dist(x,method="euclidian"),method="single")
+plot(sl.out,lwd=0.4,col.axis="brown",col="magenta",ylab="Distance",xlab="Clusters",hang=-1,main=NA,sub=NA,axes=FALSE)
+```
+
+stripchart based on signal strength
+```{r}
+stripchart(JARA.sel,method = "jitter",cex.lab=1.5,vertical=TRUE,col=c("red","darkgreen"),xlab=NA,ylab="Signal Strength")
+
+```
+
+heatmap generated based on signal strength
+```{r}
+heatmap.2(as.matrix(JARA.sel),scale="none",col=greenred(75),dendrogram = "row",key=TRUE,symkey = FALSE,density.info = "none",trace="none",cexRow=0.1,cexCol = 0.5)
+```
+
+
+
+heatmap generated based on z score
+```{r}
+JARA.z<-as.data.frame(JARA[,13:14])
+
+heatmap.2(as.matrix(JARA.z),scale="none",col=greenred(75),dendrogram = "none",key=TRUE,symkey = FALSE,density.info = "none",trace="none",cexRow=0.1,cexCol = 0.5)
+```
+
+picking top 400 signal strength and running kmeans clustering
+```{r}
+JARA400<-JARA.sel[1:400,]
+cl<-kmeans(JARA400,2)
+plot(JARA400,col=cl$cluster)
+points(cl$centers,col=1:2,pch=8,cex=2)
+
+```
+
+
+rentrez package
+install.packages("rentrez")
+```{r}
+testvector<-JARA[2:3,1]
+x<-as.data.frame(testvector)
+class(testvector)
+testvector<-JARA[2,1]
+x
+x<-as.data.frame(testvector)
+x
+entrez_fetch(db="pubmed",id=JARA[2:3,1],rettype = "abstract",retmode="")
+
+```
+
+## xxxxxxxxx
+
+
+
+```{r}
+
+
+```
