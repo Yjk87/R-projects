@@ -1,0 +1,121 @@
+---
+title: "Coding Test"
+author: "Yongjun Kwon"
+date: "2/14/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Coding Test
+
+
+```{r}
+library(tidyverse)
+library(tree)
+library(randomForest)
+```
+
+a) Performance Metrics?
+
+b) Splitting data
+
+```{r}
+set.seed(2)
+train<-sample(1:nrow(geneD),(nrow(geneD)/2))
+```
+
+geneD.ts<-geneD[-train,]
+geneD.count<-as.factor(Class)[-train]
+tree.geneD<-tree(as.factor(Class) ~.,geneD,subset=train)
+tree.pred<-predict(tree.geneD,geneD.ts,type = "class")
+table(tree.pred,geneD.count)
+
+c) Logistic regression of the data
+```{r}
+glm.geneD<-glm(as.factor(Class)~.,data=geneD, family=binomial)
+summary(glm.geneD)
+pred.geneD<-predict(glm.geneD,type="response")
+```
+
+d) Random Forest
+```{r}
+rf.geneD<-randomForest(as.factor(Class) ~.,data=geneD,subset=train,mtry=12, importance=TRUE)
+rf.geneD
+
+
+```
+\newpage
+
+2) Hamming Distance
+
+```{r}
+string1<-c("Sentences work too.")
+string2<-c("Sentences wAke too.")
+
+string1<-gsub("S","Z",string1)
+string1<-gsub("s","z",string1)
+string2<-gsub("S","Z",string2)
+string2<-gsub("s","z",string2)
+
+#first letter check
+fstr1<-tolower(substr(string1,1,1))
+fstr2<-tolower(substr(string2,1,1))
+
+#splitting/counting the first string
+split_str1<-str_split(string1,"",simplify=T)
+count_str1<-nchar(string1)
+
+hammdist<-0
+
+
+if (fstr1==fstr2)
+{
+  hammdist<-hammdist+0
+  
+  for(x in 2:count_str1)
+  {
+    str1<-substr(string1,x,x)
+    str2<-substr(string2,x,x)
+    if (str1==str2)
+      {
+        hammdist<-hammdist+0 }
+      else if (str_detect(str1,"[[:upper:]]")!=str_detect(str2,"[[:upper:]]"))
+        {
+        hammdist<-hammdist+0.5
+        
+        }   
+      else {hammdist<-hammdist+1}
+  }
+} else { 
+  
+  hammdist<-hammdist+1
+  for (x in 2:count_str1)
+  {
+    str1<-substr(string1,x,x)
+    str2<-substr(string2,x,x)
+   if (str_detect(str1,"[[:upper:]]")!=str_detect(str2,"[[:upper:]]")){ hammdist<-hammdist+0.5}
+      else  {hammdist<-hammdist+1.5}
+   }    
+  }
+  
+paste ("Calculated Hamming distance is ",hammdist)
+
+```
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+\newpage
