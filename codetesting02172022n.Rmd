@@ -1,5 +1,5 @@
 ---
-title: "Coding Test"
+title: "Coding"
 author: "Yongjun Kwon"
 date: "2/14/2022"
 output: word_document
@@ -53,8 +53,8 @@ rf.geneD
 2) Hamming Distance
 
 ```{r}
-string1<-c("Sentences work too.")
-string2<-c("Sentences wAke too.")
+string1<-c("Eagle")
+string2<-c("Eager")
 
 string1<-gsub("S","Z",string1)
 string1<-gsub("s","z",string1)
@@ -97,8 +97,15 @@ if (fstr1==fstr2)
   {
     str1<-substr(string1,x,x)
     str2<-substr(string2,x,x)
-   if (str_detect(str1,"[[:upper:]]")!=str_detect(str2,"[[:upper:]]")){ hammdist<-hammdist+0.5}
-      else  {hammdist<-hammdist+1.5}
+    if (str1==str2)
+      {
+        hammdist<-hammdist+0 }
+      else if (str_detect(str1,"[[:upper:]]")!=str_detect(str2,"[[:upper:]]"))
+        {
+        hammdist<-hammdist+0.5
+        
+        }   
+      else {hammdist<-hammdist+1}
    }    
   }
   
