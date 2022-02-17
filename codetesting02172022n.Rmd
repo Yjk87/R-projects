@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-## Coding Test
+## 1) Machine Learning
 
 
 ```{r}
@@ -24,6 +24,7 @@ a) Performance Metrics?
 b) Splitting data
 
 ```{r}
+geneD<-read_csv("gene data.csv", col_names=T)
 set.seed(2)
 train<-sample(1:nrow(geneD),(nrow(geneD)/2))
 ```
@@ -50,7 +51,7 @@ rf.geneD
 ```
 \newpage
 
-2) Hamming Distance
+##2) Hamming Distance
 
 ```{r}
 string1<-c("Eagle")
@@ -112,8 +113,19 @@ if (fstr1==fstr2)
 paste ("Calculated Hamming distance is ",hammdist)
 
 ```
+a)	"data Science" to  "Data Sciency"
+b)	"organizing" to "orGanising"
+c)	"AGPRklafsdyweIllIIgEnXuTggzF" to "AgpRkliFZdiweIllIIgENXUTygSF")
 
+d)	Describe a scenario (3-4 sentences) where implementing the standard Hamming distance algorithm would be applicable. 
 
+\nextpage
+
+## 3. Data Cleaning
+
+```{r}
+patentd<-read_csv("patent_drawing data.csv",col_names = T)
+```
 
 ## Including Plots
 
