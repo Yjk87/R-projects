@@ -1,0 +1,95 @@
+---
+title: "visualization demo v1"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+  runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(readxl)
+library(shiny)
+library(dplyr)
+library(plotly)
+
+```
+
+```{r data}
+#load
+df<-read_excel(path="sumv3.xlsx")
+
+#regex match, then replace - needs to be improved
+df$test <- sub(pattern = "^.*_MW$", replacement = "MW", x = df$`File Name`)
+df$test <- sub(pattern = "^.*_DP$", replacement = "DP", x = df$test)
+df$test <- sub(pattern = "^.*_CNM$", replacement = "CNM", x = df$test)
+df$test <- sub(pattern = "^.*_CM$", replacement = "CM", x = df$test)
+df$test <- sub(pattern = "^.*_CWW$", replacement = "CWW", x = df$test)
+df$test <- sub(pattern = "^.*_JH$", replacement = "JH", x = df$test)
+
+#standardizing the column name
+colnames(df)[colnames(df)=="test"]<-"Initials"
+
+Categorical.Variables=c("Initials","batch","Plates","SID")
+
+Numeric.Variables=c("STDConc","CP1Conc","CP2Conc","Conc. (EU/mL)")
+
+Factor.Variables=c("Initials", "Plates", "batch")
+
+```
+
+## Column {.sidebar data-width="200"}
+
+```{r}
+selectInput("categorical_variable",label="Select Categorial Variable: ", choices= Categorical.Variables)
+
+selectInput("numeric_variable",label="Select Numeric Variable: ", choices=Numeric.Variables)
+
+selectInput("factor_variable",label="Select Factor Variable: ", choices=Factor.Variables)
+
+```
+
+## Column {data-width="400"}
+
+### Chart A
+
+```{r}
+renderPlotly({
+   plot_ly(df,
+              x = ~df[[input$numeric_variable]],
+              color = ~df[[input$categorical_variable]],
+              colors = "Paired",
+              type = "box") %>%
+  layout(title = "",
+         xaxis = list(title = "" ,
+                      zeroline = FALSE))
+})
+```
+
+## Column {data-width="400"}
+
+### Chart B
+
+```{r}
+renderPlotly({
+  df %>%
+   
+    plot_ly( x = ~batch, y = ~df[[input$numeric_variable]], color = ~Initials, type='scatter', mode='markers')%>% layout(scene = list(xaxis = list(title = 'x'),yaxis = list(title = 'y')))
+    
+})
+```
+
+### Chart C
+
+```{r}
+renderPlotly({
+  df %>%
+   
+    plot_ly( x = ~df[[input$numeric_variable]], y = ~df[[input$categorical_variable]], z = ~df[[input$factor_variable]], color = ~Initials) %>%add_markers()%>% layout(scene = list(xaxis = list(title = 'x'),
+                                   yaxis = list(title = 'y'),
+                                   zaxis = list(title = 'z')))
+    
+})
+```
