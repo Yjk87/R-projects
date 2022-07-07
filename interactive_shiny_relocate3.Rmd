@@ -1,0 +1,138 @@
+---
+title: "visualization demo v1"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+  runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(reshape2)
+library(ggstatsplot)
+library(ggpubr)
+library(flexdashboard)
+library(plotly)
+library(qcc)
+library(SixSigma)
+library(DiagrammeR)
+library(AcceptanceSampling)
+library(openxlsx)
+library(mgcv)
+library(DT)
+library(lattice)
+
+```
+
+```{r data}
+#load
+df<-read_excel(path="summary06242022.xlsx")
+
+#regex match, then replace
+df$test <- sub(pattern = "^.*_MW$", replacement = "MW1", x = df$`File Name`)
+df$test <- sub(pattern = "^.*_DP$", replacement = "DP1", x = df$test)
+df$test <- sub(pattern = "^.*_CNM$", replacement = "CNM1", x = df$test)
+df$test <- sub(pattern = "^.*_CM$", replacement = "CM1", x = df$test)
+df$test <- sub(pattern = "^.*_CWW$", replacement = "CWW1", x = df$test)
+df$test <- sub(pattern = "^.*_JH$", replacement = "JH1", x = df$test)
+df$test <- sub(pattern = "^.*_YJK$", replacement = "YJK1", x = df$test)
+df$test2 <- sub(pattern = "^.*_MW$", replacement = "MW2", x = df$`File Name`)
+df$test2 <- sub(pattern = "^.*_DP$", replacement = "DP2", x = df$test2)
+df$test2 <- sub(pattern = "^.*_CNM$", replacement = "CNM2", x = df$test2)
+df$test2 <- sub(pattern = "^.*_CM$", replacement = "CM2", x = df$test2)
+df$test2 <- sub(pattern = "^.*_CWW$", replacement = "CWW2", x = df$test2)
+df$test2 <- sub(pattern = "^.*_JH$", replacement = "JH2", x = df$test2)
+df$test2 <- sub(pattern = "^.*_YJK$", replacement = "YJK2", x = df$test2)
+
+
+df$date <- gsub("^PVA1_.*\\d+_(.*)_.*","\\1 \\2", x = df$`File Name`)
+
+
+#standardizing the column name
+colnames(df)[colnames(df)=="test"]<-"Initials_1"
+colnames(df)[colnames(df)=="test2"]<-"Initials_2"
+
+#Changing class for the standard columns. (why chr.???)
+i<- c(40:47)
+df[,i]<-lapply(df[,i], function(x) as.numeric(as.character(x)))
+
+#arrange by batch number first
+df<-df%>%arrange(batch)
+
+#this works
+df$ID<-1:nrow(df)
+
+#remove NAs
+df<-na.omit(df)
+
+
+Categorical.Variables=c("Initials_1","Initials_2","batch","Plates","ID")
+
+Numeric.Variables=c("STDConc","CP1Conc","CP2Conc","STDODA2")
+
+Factor.Variables=c("Initials_1","Initials_2", "Plates", "batch","ID")
+
+```
+
+## Column {.sidebar data-width="200"}
+
+```{r}
+selectInput("categorical_variable",label="Select Categorial Variable: ", choices= Categorical.Variables)
+
+selectInput("numeric_variable",label="Select Numeric Variable: ", choices=Numeric.Variables)
+
+selectInput("factor_variable",label="Select Factor Variable: ", choices=Factor.Variables)
+
+```
+
+## Column {data-width="400"}
+
+### Chart A
+
+```{r}
+renderPlotly({
+  df %>%
+   
+    plot_ly( x = ~batch, y = ~df[[input$numeric_variable]], color = ~Initials_1, type='scatter', mode='markers')%>% layout(scene = list(xaxis = list(title = 'x'),yaxis = list(title = 'y'))) 
+    
+})
+
+```
+
+## Column {data-width="400"}
+
+### Chart B
+
+```{r}
+
+renderPlotly({
+   plot_ly(df,
+              x = ~df[[input$numeric_variable]],
+              color = ~df[[input$categorical_variable]],
+              colors = "Paired",
+              type = "box") %>%
+  layout(title = "",
+         xaxis = list(title = "" ,
+                      zeroline = FALSE))
+})
+```
+
+### Chart C
+
+```{r}
+renderPlotly({
+  df %>%
+   
+    plot_ly( x = ~df[[input$numeric_variable]], y = ~df[[input$categorical_variable]], z = ~df[[input$factor_variable]], color = ~Initials_1) %>%add_markers()%>% layout(scene = list(xaxis = list(title = 'x'),
+                                   yaxis = list(title = 'y'),
+                                   zaxis = list(title = 'z')))
+    
+})
+```
+
+
+```{r}
+#shinyApp(ui = ui, server = server)
+```
